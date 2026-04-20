@@ -1,0 +1,16 @@
+#Ignoramos los datos ya que son muy pesados
+*.csv
+
+
+#Ignoramos el virtual enviroment para evitar conflictos
+RAPPI_VENV/
+
+#Ignoramos el Caché de python
+__pycache__/
+*.pyc
+
+
+#Ignoramos los archivos del sistema para evitar problemas
+.vscode/
+.DS_Store
+Thumbs.db
