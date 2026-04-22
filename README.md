@@ -1,4 +1,4 @@
-# 🟠 Rappi Availability & AI Operational Insights
+#  Rappi Availability & AI Operational Insights :>
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)](https://nextjs.org/)
@@ -29,25 +29,25 @@ Maximizar la disponibilidad de tiendas y restaurantes mediante el análisis de d
 ##  Metodología CRISP-DM
 El ciclo de vida del dato en este proyecto sigue el estándar **CRISP-DM** (*Cross-Industry Standard Process for Data Mining*), documentado en el Bloque 1:
 
-1.  **Business Understanding:** Definición de KPIs de disponibilidad.
-2.  **Data Understanding:** Exploración de snapshots de disponibilidad.
-3.  **Data Preparation:** Limpieza y feature engineering (series temporales).
-4.  **Modeling:** Implementación de **K-Means** (Clustering) y modelos autorregresivos (Forecasting).
-5.  **Evaluation:** Validación de métricas de error (MAE/RMSE).
-6.  **Deployment:** Integración de resultados en una API REST para consumo en tiempo real.
+1.  **Business Understanding:** Definición de KPIs de disponibilidad y necesidades del negocio.
+2.  **Data Understanding:** Exploración de snapshots de disponibilidad y detección de patrones iniciales.
+3.  **Data Preparation:** Limpieza, manejo de nulos y feature engineering (extracción de horas, días y franjas).
+4.  **Modeling:** Implementación de K-Means para clustering de perfiles diarios y Random Forest para forecasting.
+5.  **Evaluation:** Validación de métricas de error (MAE) y relevancia de variables (Feature Importance).
+6.  **Deployment:** Integración de los modelos en una API productiva y un dashboard interactivo.
 
 ---
 
 ##  Arquitectura y Racional Tecnológico
 
 ###  Backend: FastAPI
-*   **¿Por qué?** Elegimos FastAPI por su alto rendimiento (basado en Starlette y Pydantic) y su capacidad nativa de manejar asincronía, ideal para las llamadas externas a modelos de lenguaje (LLMs) sin bloquear el hilo principal.
+*   **Racional:** Elegimos FastAPI por su alto rendimiento y manejo nativo de asincronía. Es ideal para integrar el SDK de Groq, permitiendo que la IA responda sin bloquear otras peticiones del dashboard.
 
 ###  Frontend: Next.js + Tailwind CSS
-*   **¿Por qué?** Next.js 14 permite una renderización híbrida y una experiencia de usuario fluida (SPA). Tailwind CSS facilita la creación de una interfaz personalizada siguiendo los lineamientos estéticos de Rappi.
+*   **Racional:** Next.js 14 ofrece una estructura robusta para aplicaciones de datos. Tailwind CSS permite una interfaz limpia y profesional acorde a la identidad visual de Rappi.
 
 ###  IA: Groq Cloud (Llama 3.3 70B)
-*   **¿Por qué?** Groq ofrece una latencia ultra-baja en inferencia, permitiendo que RappiBot responda en milisegundos. Usamos Llama 3.3 por su razonamiento avanzado sobre datos tabulares cargados en RAM.
+*   **Racional:** El uso de Groq garantiza una respuesta en tiempo real (milisegundos), este modelo fue usado en lugar de gemini por temas de limitaciones en la cantidad de tokens que se pueden usar en la version gratuita de gemini. El modelo Llama 3.3 es capaz de interpretar los resultados de los modelos de ML y el historial CSV cargado en memoria.
 
 ---
 
@@ -59,9 +59,10 @@ El ciclo de vida del dato en este proyecto sigue el estándar **CRISP-DM** (*Cro
 │   ├── BLOQUE_1/                # Ciencia de Datos (CRISP-DM Notebooks)
 │   ├── BLOQUE_2/                # Aplicación Web (Next.js)
 │   └── BLOQUE_3/                # API Engine & IA (FastAPI)
-├── Dockerfile                   # Configuración de contenedor (API)
-├── docker-compose.yml           # Orquestación de servicios
-├── requirements.txt             # Dependencias de Python consolidadas
+├── Dockerfile                   # Configuración del contenedor (Backend)
+├── .env.example                 # Plantilla de variables de entorno
+├── docker-compose.yml           # Orquestación de contenedores
+├── requirements.txt             # Dependencias de Python completas
 └── README.md                    # Este documento
 ```
 
@@ -69,66 +70,64 @@ El ciclo de vida del dato en este proyecto sigue el estándar **CRISP-DM** (*Cro
 
 ##  Guía de Instalación
 
-### 1. Prerrequisitos
-*   **Python 3.11+**
-*   **Node.js 18+**
-*   **Git**
-
-### 2. Clonar y Configurar Python
+### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/JairoVillegas/AVALIAVILITY-ANALISYS.git
 cd AVALIAVILITY-ANALISYS
+```
+
+### 2. Configurar Variables de Entorno
+Copia la plantilla de ejemplo y añade tu API Key:
+```bash
+cp .env.example PROYECTO/BLOQUE_3/backend/.env
+# Edita el archivo y pon tu GROQ_API_KEY
+```
+
+### 3. Instalación Local (Python)
+```bash
 python -m venv venv
-source venv/bin/activate  # En Windows: .\venv\Scripts\activate
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Configurar Frontend
+### 4. Instalación Local (Frontend)
 ```bash
 cd PROYECTO/BLOQUE_2/frontend
 npm install
 ```
 
-### 4. Variables de Entorno
-Crea un archivo `.env` en `PROYECTO/BLOQUE_3/backend/`:
-```env
-GROQ_API_KEY=tu_api_key_aqui
-```
-
 ---
 
-##  Ejecución
+##  Ejecución Manual
 
-### Terminal 1: Backend
+Requiere dos terminales activas:
+
+**Terminal 1 (API):**
 ```bash
 cd PROYECTO/BLOQUE_3/backend
 python main.py
 ```
 
-### Terminal 2: Frontend
+**Terminal 2 (Web):**
 ```bash
 cd PROYECTO/BLOQUE_2/frontend
 npm run dev
 ```
-Visita [localhost:3000](http://localhost:3000)
 
 ---
 
 ##  Dockerización
-Si prefieres correr el proyecto usando contenedores:
+Para una ejecución rápida y aislada:
 
 ```bash
 docker-compose up --build
 ```
-Esto levantará automáticamente la API (8000) y el Frontend (3000).
+Esto levantará el Backend en el puerto **8000** y el Frontend en el puerto **3000**.
 
 ---
 
 ##  RappiBot (Inteligencia Operacional)
-RappiBot integra el conocimiento de los modelos de ML con el lenguaje natural.
-*   **Synonym Engine:** Entiende que "tiendas", "restaurantes" y "oferta" son conceptos unificados.
-*   **Time-Aware:** Capaz de responder sobre el comportamiento de fechas específicas consultando directamente `AVAILABILITY-procesado.csv`.
-*   **Context Caching:** Mantiene la base de conocimientos operacional en memoria para respuestas instantáneas.
-
----
-
+RappiBot actúa como un analista experto en la disponibilidad de la plataforma:
+*   **Sinónimos Operativos:** Entiende lenguaje natural y es capaz de responder preguntas asociadas al dashboard, como por ejemplo explicar terminos que nos conozcamos o buscar un dato en especifico en el dashboard y darnoslo.
+*   **Memoria Histórica:** Consulta directamente `AVAILABILITY-procesado.csv` para dar datos exactos de fechas pasadas además de que está contextualizado con todos los resulados del bloque 1 y la metodología crisp dm para evitar alucinaciones.
+*   **Visión Predictiva:** Conoce los clusters y pronósticos de las próximas 24 horas generados por los modelos de ML en el bloque 1 ademas de que puede reconocer cuales son las features más importantes al momento de la predicción.

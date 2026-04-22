@@ -1,5 +1,5 @@
-#Ignoramos los datos ya que son muy pesados
-*.csv
+# Ignoramos solo los datos crudos por su peso
+DATOS/DATOS_CRUDOS/*.csv
 
 
 #Ignoramos el virtual enviroment para evitar conflictos
