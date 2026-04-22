@@ -292,7 +292,7 @@ export default function Dashboard() {
                     <ResponsiveContainer width="100%" height={450}>
                         <BarChart layout="vertical" data={featuresTraducidas} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke={colorGrid} horizontal={true} vertical={false} />
-                            <XAxis type="number" stroke={colorText} scale="log" domain={['dataMin', 'dataMax']} />
+                            <XAxis type="number" stroke={colorText} scale="log" domain={[0.0001, 'auto']} />
                             <YAxis dataKey="variableTraducida" type="category" stroke={colorText} width={290} />
                             <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.02)' }} contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${colorPink}`, borderRadius: '12px', color: '#1e1f29' }} />
                             <Bar dataKey="Importance" fill="url(#colorMag)" radius={[0, 8, 8, 0]} name="Gravedad del Factor (Impacto sobre Oferta)" />
