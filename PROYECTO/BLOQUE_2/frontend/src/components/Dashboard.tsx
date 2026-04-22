@@ -114,7 +114,7 @@ export default function Dashboard() {
                         <p style={{ margin: 0, color: colorText, fontSize: '13px', marginTop: '6px' }}>
                             Comportamiento catalogado como:<br />
                             <strong style={{ color: data.cluster === clusterAlto ? colorCyan : colorPink }}>
-                                {data.cluster === clusterAlto ? 'Grupo 1 (Alta Demanda)' : 'Grupo 2 (Baja Demanda)'}
+                                {data.cluster === clusterAlto ? 'Grupo 1 (Alta Disponibilidad)' : 'Grupo 2 (Baja Disponibilidad)'}
                             </strong>
                         </p>
                     </div>
@@ -146,10 +146,10 @@ export default function Dashboard() {
                             <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomPCATooltip />} />
                             <Legend verticalAlign="top" align="right" height={36} iconType="circle" />
 
-                            <Scatter name={clusterAlto === 0 ? "Grupo 1 (Alta Demanda)" : "Grupo 2 (Baja Demanda)"} data={pcaEnriquecido.filter((d: any) => d.cluster === 0)} fill={clusterAlto === 0 ? colorCyan : colorPink} shape="circle">
+                            <Scatter name={clusterAlto === 0 ? "Grupo 1 (Alta Disponibilidad)" : "Grupo 2 (Baja Disponibilidad)"} data={pcaEnriquecido.filter((d: any) => d.cluster === 0)} fill={clusterAlto === 0 ? colorCyan : colorPink} shape="circle">
                                 <LabelList dataKey="leyendaFija" position="top" style={{ fill: colorText, fontSize: '12px', fontWeight: 'bold' }} offset={10} />
                             </Scatter>
-                            <Scatter name={clusterAlto === 1 ? "Grupo 1 (Alta Demanda)" : "Grupo 2 (Baja Demanda)"} data={pcaEnriquecido.filter((d: any) => d.cluster === 1)} fill={clusterAlto === 1 ? colorCyan : colorPink} shape="square">
+                            <Scatter name={clusterAlto === 1 ? "Grupo 1 (Alta Disponibilidad)" : "Grupo 2 (Baja Disponibilidad)"} data={pcaEnriquecido.filter((d: any) => d.cluster === 1)} fill={clusterAlto === 1 ? colorCyan : colorPink} shape="square">
                                 <LabelList dataKey="leyendaFija" position="top" style={{ fill: colorText, fontSize: '12px', fontWeight: 'bold' }} offset={10} />
                             </Scatter>
                         </ScatterChart>
@@ -192,7 +192,7 @@ export default function Dashboard() {
                                     <Area
                                         key={c}
                                         type="monotone"
-                                        name={`Promedio de tiendas del Grupo ${isHigh ? '1 (Alta Demanda)' : '2 (Baja Demanda)'}`}
+                                        name={`Promedio de tiendas del Grupo ${isHigh ? '1 (Alta Disponibilidad)' : '2 (Baja Disponibilidad)'}`}
                                         dataKey={`Grupo ${c}`}
                                         stroke={isHigh ? colorCyan : colorPink}
                                         fillOpacity={1}

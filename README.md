@@ -5,7 +5,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Una solución integral de **Business Intelligence e Inteligencia Artificial** diseñada para optimizar la toma de decisiones en la oferta de Rappi. El proyecto combina analítica avanzada, predicción de demanda y un agente conversacional experto.
+Una solución integral de **Business Intelligence e Inteligencia Artificial** diseñada para optimizar la toma de decisiones en la oferta de Rappi. El proyecto combina analítica avanzada, predicción de disponibilidad y un agente conversacional experto.
 
 ---
 
@@ -22,7 +22,7 @@ Una solución integral de **Business Intelligence e Inteligencia Artificial** di
 ---
 
 ##  Objetivo del Proyecto
-Maximizar la disponibilidad de tiendas y restaurantes mediante el análisis de datos históricos para predecir vacíos en la oferta. El sistema proporciona un dashboard interactivo para vizualizar clusters de comportamiento y un chatbot de IA para consultas operativas rápidas.
+Maximizar la disponibilidad de tiendas y restaurantes mediante el análisis de datos históricos para predecir vacíos en la disponibilidad. El sistema proporciona un dashboard interactivo para vizualizar clusters de comportamiento y un chatbot de IA para consultas operativas rápidas.
 
 ---
 
