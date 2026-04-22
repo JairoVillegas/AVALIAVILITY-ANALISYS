@@ -144,6 +144,7 @@ export default function Dashboard() {
                             <ZAxis type="category" dataKey="nombreDiaHover" name="Detalle" />
 
                             <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomPCATooltip />} />
+                            <Legend verticalAlign="top" align="right" height={36} iconType="circle" />
 
                             <Scatter name={clusterAlto === 0 ? "Grupo 1 (Alta Demanda)" : "Grupo 2 (Baja Demanda)"} data={pcaEnriquecido.filter((d: any) => d.cluster === 0)} fill={clusterAlto === 0 ? colorCyan : colorPink} shape="circle">
                                 <LabelList dataKey="leyendaFija" position="top" style={{ fill: colorText, fontSize: '12px', fontWeight: 'bold' }} offset={10} />
@@ -243,15 +244,15 @@ export default function Dashboard() {
                 </div>
 
                 {/* MÉTRICAS MOVIDAS ABAJO */}
-                {metrics.map((m: any) => (
+                {metrics.filter((m: any) => !m.Metrica.includes('R2')).map((m: any) => (
                     <div key={m.Metrica} className="glass-card metric-card">
                         <span className="metric-title">{m.Metrica.replace(/_/g, ' ')}</span>
                         <span className="metric-value">
-                            {m.Metrica.includes('MAPE') || m.Metrica.includes('R2')
+                            {m.Metrica.includes('MAPE')
                                 ? (m.Valor * 100).toFixed(1) + '%'
                                 : formatCompactNumber(Number(m.Valor))}
                         </span>
-                        <div className={`metric-trend ${m.Metrica.includes('R2') || m.Metrica.includes('TRAIN') ? 'trend-up' : 'trend-down'}`}>
+                        <div className={`metric-trend ${m.Metrica.includes('TRAIN') ? 'trend-up' : 'trend-down'}`}>
                             Evaluación Modelo Random Forest
                         </div>
                     </div>

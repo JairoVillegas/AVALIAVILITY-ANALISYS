@@ -29,6 +29,60 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../DAT
 # al arrancar el servidor, no en cada llamada al chat.
 # =====================================================================
 _DATA_CONTEXT_CACHE: str = ""
+_HISTORICAL_DF: pd.DataFrame = None
+
+def get_historical_context(user_query: str) -> str:
+    """
+    Busca fechas o momentos específicos en el historial completo (CSV procesado)
+    para inyectarlos como contexto fresco si el usuario pregunta por el pasado.
+    """
+    global _HISTORICAL_DF
+    if _HISTORICAL_DF is None:
+        return ""
+    
+    query_lower = user_query.lower()
+    # Heurística simple para detectar fechas en febrero 2026
+    # Buscamos números del 1 al 11 (rango del CSV)
+    found_day = None
+    meses_feb = ["febrero", "feb", "/02/", "-02-"]
+    
+    if any(m in query_lower for m in meses_feb) or "pasado" in query_lower or "historial" in query_lower:
+        # Buscamos del 11 al 1 (reversa) para evitar que "10" sea detectado como "1"
+        for d in range(11, 0, -1):
+            if f" {d}" in f" {query_lower}" or f"{d:02d}" in query_lower:
+                found_day = f"2026-02-{d:02d}"
+                break
+    
+    if found_day:
+        print(f"🔎 Buscando datos históricos para: {found_day}...")
+        # Filtramos el DF por ese día
+        day_data = _HISTORICAL_DF[_HISTORICAL_DF['timestamp'].str.contains(found_day)]
+        if not day_data.empty:
+            # Si preguntan por una hora específica (ej. "a las 12")
+            import re
+            hour_match = re.search(r'(\d{1,2})\s*(?:am|pm|:00|hrs|horas|h)', query_lower)
+            if not hour_match:
+                hour_match = re.search(r'las\s+(\d{1,2})', query_lower)
+            
+            if hour_match:
+                target_hour = f" {int(hour_match.group(1)):02d}:"
+                hour_data = day_data[day_data['timestamp'].str.contains(target_hour)]
+                if not hour_data.empty:
+                    # Retornamos una muestra de esa hora
+                    res = hour_data.head(5)
+                    data_str = "\n".join([f"  - {row['timestamp']}: {int(row['visible_stores']):,} tiendas" for _, row in res.iterrows()])
+                    return f"\nDATOS HISTÓRICOS ESPECÍFICOS PARA EL {found_day} (Cerca de la hora solicitada):\n{data_str}"
+            
+            # Si no hay hora o no se encontró la hora, damos un resumen del día
+            pico = day_data.loc[day_data['visible_stores'].idxmax()]
+            valle = day_data.loc[day_data['visible_stores'].idxmin()]
+            avg = day_data['visible_stores'].mean()
+            return (f"\nDATOS HISTÓRICOS PARA EL {found_day}:\n"
+                    f"  - Promedio del día: {int(avg):,} tiendas disponibles.\n"
+                    f"  - Punto máximo: {int(pico['visible_stores']):,} tiendas a las {pico['timestamp'][11:16]}.\n"
+                    f"  - Punto mínimo: {int(valle['visible_stores']):,} tiendas a las {valle['timestamp'][11:16]}.")
+    
+    return ""
 
 def build_data_context() -> str:
     """
@@ -106,8 +160,15 @@ def build_data_context() -> str:
 @app.on_event("startup")
 async def startup_event():
     """Al arrancar el servidor se cachea el contexto de datos en memoria."""
-    global _DATA_CONTEXT_CACHE
+    global _DATA_CONTEXT_CACHE, _HISTORICAL_DF
     _DATA_CONTEXT_CACHE = build_data_context()
+    
+    # Cargar historial completo para consultas específicas
+    hist_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../DATOS/DATOS_PROCESADOS/AVAILABILITY-procesado.csv"))
+    if os.path.exists(hist_path):
+        _HISTORICAL_DF = pd.read_csv(hist_path)
+        print(f"✅ Historial completo cargado ({len(_HISTORICAL_DF)} filas).")
+    
     print("✅ Contexto de datos cacheado en memoria al iniciar.")
 
 
@@ -174,6 +235,7 @@ REGLAS:
 - Responde SIEMPRE en español
 - Usa lenguaje claro y ejecutivo, sin jerga técnica innecesaria
 - Basa tus respuestas ÚNICAMENTE en los datos proporcionados
+- IMPORTANTE: En este dataset, los términos "Tiendas", "Restaurantes" y "Establecimientos" son SINÓNIMOS. Si te preguntan por oferta de restaurantes, usa los datos de tiendas.
 - Si no tienes información suficiente, dilo honestamente
 - Sé conciso: máximo 4-5 párrafos. Usa **negrita** para cifras clave
 
@@ -198,8 +260,13 @@ async def chat_with_agent(request: ChatRequest):
 
         client = Groq(api_key=api_key)
 
-        # El contexto ya está cacheado en memoria desde el startup — sin releer CSV
-        system_content = SYSTEM_PROMPT.format(data_context=_DATA_CONTEXT_CACHE)
+        # El contexto ya está cacheado en memoria desde el startup
+        base_context = _DATA_CONTEXT_CACHE
+        
+        # Búsqueda dinámica en el historial si el usuario pregunta por el pasado
+        historical_context = get_historical_context(request.message)
+        
+        system_content = SYSTEM_PROMPT.format(data_context=base_context + historical_context)
 
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
